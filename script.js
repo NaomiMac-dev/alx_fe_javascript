@@ -7,7 +7,7 @@ const quotes = [
 ];
 
 // Creating the showRandomQuote() function
-function showRandomQuote() {
+function displayRandomQuote() {
     const randomIndex = Math.floor(Math.random() * quotes.length);
     const quote = quotes[randomIndex];
 
@@ -42,5 +42,5 @@ function addQuote() {
     showRandomQuote();
   }
   
-// Hooking the function to the button
-document.getElementById("newQuote").addEventListener("click", showRandomQuote);
+// Hooking the function to the button using an event listener
+document.getElementById("newQuote").addEventListener("click", displayRandomQuote);
