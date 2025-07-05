@@ -1,22 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dynamic Quote Generator</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dynamic Quote Sync App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f9f9f9;
+    }
+
+    #app-container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    input, button {
+      padding: 10px;
+      width: 100%;
+      margin: 5px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .quote {
+      padding: 10px;
+      margin-top: 10px;
+      background: #e3f2fd;
+      border-left: 5px solid #2196f3;
+      border-radius: 5px;
+      position: relative;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #f44336;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      padding: 5px;
+      cursor: pointer;
+    }
+
+    .notification {
+      background: #fffae6;
+      border: 1px solid #ffd700;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Dynamic Quote Generator</h1>
-  <div id="quoteDisplay"></div>
-  <button id="newQuote">Show New Quote</button>
-<!--  Form for adding quotes -->
-  <div>
-    <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
-    <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
-    <button onclick="addQuote()">Add Quote</button>
+  <div id="app-container">
+    <h2>Dynamic Quote Generator</h2>
+    <input type="text" id="quote-text" placeholder="Enter quote">
+    <input type="text" id="quote-author" placeholder="Enter author">
+    <button id="add-quote-btn">Add Quote</button>
+    <button onclick="syncWithServer()">Sync Now</button>
+
+    <div id="notifications"></div>
+    <div id="quote-list"></div>
   </div>
-  
-  <script src="script.js"></script>
-  
-</body>
-</html>

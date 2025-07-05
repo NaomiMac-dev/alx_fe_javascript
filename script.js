@@ -1,46 +1,87 @@
-//  Creating the quotes array
-const quotes = [
-    { text: "Believe in yourself!", category: "Motivation"},
-    { text: "Code is like hiumor. When you have to explain it, it's bad.", category: "Tech"},
-    { text: "Love is composed of a single soul inhabiting two bodies.", category: "Love"},
-    { text: "Stay hungry, stay foolish!", category:"Inspiration"},
-];
 
-// Creating the showRandomQuote() function
-function displayRandomQuote() {
-    const randomIndex = Math.floor(Math.random() * quotes.length);
-    const quote = quotes[randomIndex];
+const quoteInput = document.getElementById('quote-text');
+const authorInput = document.getElementById('quote-author');
+const addButton = document.getElementById('add-quote-btn');
+const quoteList = document.getElementById('quote-list');
+const notifications = document.getElementById('notifications');
 
-    const quoteDisplay = document.getElementById("quoteDisplay");
-    quoteDisplay.innerHTML = `
-    <P> "${quote.text}"</p>
-    <p><em>Category: ${quote.category}</em></p>
-    `;
+document.addEventListener('DOMContentLoaded', loadQuotes);
+addButton.addEventListener('click', addQuote);
+
+function addQuote() {
+  const quote = quoteInput.value.trim();
+  const author = authorInput.value.trim();
+
+  if (!quote || !author) {
+    alert("Both fields are required!");
+    return;
+  }
+
+  const quoteObj = { text: quote, author: author };
+  const uniqueKey = `quote_${Date.now()}`;
+
+  localStorage.setItem(uniqueKey, JSON.stringify(quoteObj));
+  quoteInput.value = '';
+  authorInput.value = '';
+  loadQuotes();
 }
 
-// Adding Quotes Dynamically
-function addQuote() {
-    const newText = document.getElementById("newQuoteText").value.trim();
-    const newCategory = document.getElementById("newQuoteCategory").value.trim();
-  
-    if (newText === "" || newCategory === "") {
-      alert("Please enter both a quote and a category.");
-      return;
+function loadQuotes() {
+  quoteList.innerHTML = '';
+
+  Object.keys(localStorage).forEach(key => {
+    if (key.startsWith('quote_')) {
+      const quoteObj = JSON.parse(localStorage.getItem(key));
+
+      const quoteDiv = document.createElement('div');
+      quoteDiv.classList.add('quote');
+      quoteDiv.innerHTML = `
+        <strong>"${quoteObj.text}"</strong><br>
+        — <em>${quoteObj.author}</em>
+        <button class="remove-btn" data-key="${key}">Remove</button>
+      `;
+      quoteList.appendChild(quoteDiv);
     }
-  
-    const newQuote = {
-      text: newText,
-      category: newCategory
-    };
-  
-    quotes.push(newQuote);
-    document.getElementById("newQuoteText").value = "";
-    document.getElementById("newQuoteCategory").value = "";
-    alert("Quote added successfully!");
-  
-    // Optionally show the new quote immediately
-    showRandomQuote();
-  }
-  
-// Hooking the function to the button using an event listener
-document.getElementById("newQuote").addEventListener("click", displayRandomQuote);
+  });
+
+  document.querySelectorAll('.remove-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const key = this.getAttribute('data-key');
+      localStorage.removeItem(key);
+      loadQuotes();
+    });
+  });
+}
+
+function notifyUser(message) {
+  const note = document.createElement('div');
+  note.className = 'notification';
+  note.textContent = message;
+  notifications.innerHTML = '';
+  notifications.appendChild(note);
+  setTimeout(() => note.remove(), 5000);
+}
+
+function syncWithServer() {
+  fetch('https://jsonplaceholder.typicode.com/posts?_limit=5')
+    .then(response => response.json())
+    .then(serverQuotes => {
+      serverQuotes.forEach(serverQuote => {
+        const key = `quote_${serverQuote.id}`;
+        const serverData = {
+          text: serverQuote.title,
+          author: `User ${serverQuote.userId}`
+        };
+
+        // Server always wins
+        localStorage.setItem(key, JSON.stringify(serverData));
+      });
+
+      loadQuotes();
+      notifyUser("Quotes synced with server and conflicts resolved.");
+    })
+    .catch(() => notifyUser("Failed to sync with server."));
+}
+
+// Auto sync every 30s
+setInterval(syncWithServer, 30000);
